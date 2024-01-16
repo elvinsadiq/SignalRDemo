@@ -1,6 +1,6 @@
 using BlazorServer.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.ResponseCompression;
+using BlazorServer.Hubs;
 
 namespace BlazorServer
 {
@@ -14,6 +14,13 @@ namespace BlazorServer
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddSingleton<WeatherForecastService>();
+
+            //SignalR service configuration
+            builder.Services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
 
             var app = builder.Build();
 
@@ -32,6 +39,7 @@ namespace BlazorServer
             app.UseRouting();
 
             app.MapBlazorHub();
+            app.MapHub<ChatHub>("/chathub");
             app.MapFallbackToPage("/_Host");
 
             app.Run();
