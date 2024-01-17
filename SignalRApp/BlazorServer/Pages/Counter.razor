@@ -20,7 +20,7 @@
             .WithAutomaticReconnect()
             .Build();
 
-        hubConnection.On<string, int>("CounterIncremented", (user, value) =>
+        hubConnection.On<string, int>("CounterIncrement", (user, value) =>
         {
             currentCount += value;
             InvokeAsync(StateHasChanged);
