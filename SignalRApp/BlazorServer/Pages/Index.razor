@@ -13,7 +13,16 @@
         Message : <input @bind="messageInput" />
     </label>
 </div>
-<button @onclick="Send" disabled="@(!IsConnected == false)"></button>
+<button @onclick="Send" disabled="@(IsConnected == false)">Send</button>
+
+<hr />
+
+<ul>
+    @foreach(string message in messages)
+    {
+        <li>@message</li>
+    }
+</ul>
 
 @code {
     private HubConnection? hubConnection;
@@ -21,7 +30,7 @@
     private string? userInput;
     private string? messageInput;
 
-    protected override async Task OnInitializedAysnc()
+    protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavManager.ToAbsoluteUri("/chathub"))
@@ -43,8 +52,18 @@
     {
         if (hubConnection is not null)
         {
+            //It will be triggered in other words broadcast this
             await hubConnection.SendAsync("SendMessage", userInput, messageInput);
-            //31:04
+        }
+    }
+
+    public bool IsConnected => hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if(hubConnection != null)
+        {
+            await hubConnection.DisposeAsync();
         }
     }
 }
